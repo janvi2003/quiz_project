@@ -1,0 +1,82 @@
+<!-- quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Application - Take Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Take Quiz</h1>
+    </header>
+    <section id="quiz-container">
+        <div id="question">
+            <!-- Question content will be fetched dynamically -->
+        </div>
+        <form id="quiz-form">
+            <!-- Options will be added dynamically -->
+        </form>
+        <button id="next-btn">Next</button>
+        <button id="submit-btn">Submit</button>
+    </section>
+    <footer>
+        <p>&copy; 2024 Quiz Application</p>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionDiv = document.getElementById('question');
+            const quizForm = document.getElementById('quiz-form');
+            const nextButton = document.getElementById('next-btn');
+            const submitButton = document.getElementById('submit-btn');
+
+            let currentQuestionIndex = 0;
+            let questions = []; // This array will hold questions fetched from backend
+
+            // Function to fetch random questions from backend API
+            function fetchRandomQuestions() {
+                fetch('/api/questions?count=5') // Endpoint to fetch 5 random questions from backend
+                    .then(response => response.json())
+                    .then(data => {
+                        questions = data;
+                        displayQuestion();
+                    })
+                    .catch(error => console.error('Error fetching questions:', error));
+            }
+
+            // Function to display current question
+            function displayQuestion() {
+                const currentQuestion = questions[currentQuestionIndex];
+                questionDiv.innerHTML = `<p>${currentQuestion.questionText}</p>`;
+                quizForm.innerHTML = currentQuestion.options.map((option, index) =>
+                    `<input type="radio" id="option${index}" name="answer" value="${option}">
+                    <label for="option${index}">${option}</label><br>`
+                ).join('');
+            }
+
+            // Function to handle next button click
+            nextButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    displayQuestion();
+                } else {
+                    // No more questions, disable next button
+                    nextButton.disabled = true;
+                }
+            });
+
+            // Function to handle form submission
+            quizForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                // Handle form submission, e.g., check answer
+            });
+
+            // Fetch random questions when the page loads
+            fetchRandomQuestions();
+        });
+    </script>
+</body>
+</html>
